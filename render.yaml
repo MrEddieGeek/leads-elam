@@ -27,5 +27,3 @@ services:
       - key: POSTGRES_USER
         value: leads_user
 
-previews:
-  enabled: true
