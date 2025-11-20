@@ -10,16 +10,3 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
-
-  - type: pserv
-    name: leads-db
-    env: docker
-    region: oregon
-    plan: free
-    envVars:
-      - key: POSTGRES_PASSWORD
-        generateValue: true
-      - key: POSTGRES_DB
-        value: leads_db
-      - key: POSTGRES_USER
-        value: leads_user
