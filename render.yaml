@@ -16,9 +16,6 @@ services:
     env: docker
     region: oregon
     plan: free
-    disk:
-      name: pgdata
-      mountPath: /var/lib/postgresql/data
     envVars:
       - key: POSTGRES_PASSWORD
         generateValue: true
@@ -26,4 +23,3 @@ services:
         value: leads_db
       - key: POSTGRES_USER
         value: leads_user
-
