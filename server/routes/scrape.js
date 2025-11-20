@@ -1,13 +1,15 @@
 import express from 'express';
-import Lead from '../models/Lead.js';
-import MexicanBusinessScraper from '../scrapers/mexicanBusinessScraper.js';
+import { buscarEnGoogleMaps } from '../scrapers/googleMapsScraper.js';
+import pkg from '@prisma/client';
 
+const { PrismaClient } = pkg;
 const router = express.Router();
+const prisma = new PrismaClient();
 
-// POST /api/scrape - Trigger on-demand scraping
+// POST /api/scrape - Trigger on-demand scraping with Google Maps
 router.post('/', async (req, res, next) => {
   try {
-    const { giro_empresa, ubicacion, maxResults = 50 } = req.body;
+    const { giro_empresa, ubicacion, maxResults = 20 } = req.body;
 
     // Validate inputs
     if (!giro_empresa || !ubicacion) {
@@ -34,31 +36,64 @@ router.post('/', async (req, res, next) => {
       });
     }
 
-    console.log(`Scraping request: ${giro_empresa} in ${ubicacion}`);
+    console.log(`🔍 Searching Google Maps: ${giro_empresa} in ${ubicacion}`);
 
-    // Initialize scraper
-    const scraper = new MexicanBusinessScraper();
-
-    // Run scraping
-    const scrapedLeads = await scraper.scrape({
-      giro_empresa: giro_empresa.toLowerCase(),
+    // Search using Google Maps API
+    const leadsFound = await buscarEnGoogleMaps(
+      giro_empresa.toLowerCase(),
       ubicacion,
-      maxResults: parseInt(maxResults)
-    });
+      parseInt(maxResults)
+    );
 
-    // Save leads to database
-    const result = await Lead.bulkCreate(scrapedLeads);
+    if (leadsFound.length === 0) {
+      return res.json({
+        success: true,
+        data: {
+          created: 0,
+          duplicates: 0,
+          total: 0,
+          leads: [],
+          duplicateDetails: []
+        },
+        message: 'No se encontraron resultados'
+      });
+    }
+
+    // Save leads to database (with duplicate checking)
+    let created = 0;
+    const createdLeads = [];
+    const duplicates = [];
+
+    for (const lead of leadsFound) {
+      try {
+        // Check if lead already exists by google_place_id
+        const existing = lead.google_place_id ? await prisma.lead.findUnique({
+          where: { google_place_id: lead.google_place_id }
+        }) : null;
+
+        if (existing) {
+          duplicates.push({ ...lead, reason: 'duplicate' });
+        } else {
+          const newLead = await prisma.lead.create({ data: lead });
+          createdLeads.push(newLead);
+          created++;
+        }
+      } catch (error) {
+        console.error('Error saving lead:', error.message);
+        duplicates.push({ ...lead, reason: error.message });
+      }
+    }
 
     res.json({
       success: true,
       data: {
-        created: result.created.length,
-        duplicates: result.duplicates.length,
-        total: scrapedLeads.length,
-        leads: result.created,
-        duplicateDetails: result.duplicates
+        created,
+        duplicates: duplicates.length,
+        total: leadsFound.length,
+        leads: createdLeads,
+        duplicateDetails: duplicates
       },
-      message: `Successfully created ${result.created.length} new leads. ${result.duplicates.length} duplicates skipped.`
+      message: `Listo! +${created} leads nuevos guardados (total encontrados: ${leadsFound.length})`
     });
 
   } catch (error) {
