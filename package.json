@@ -5,7 +5,8 @@
   "main": "server/index.js",
   "type": "module",
   "scripts": {
-    "build": "prisma generate && cd client && npm run build",
+    "postinstall": "prisma generate",
+    "build": "cd client && npm run build",
     "start": "node server/index.js",
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "server:dev": "nodemon server/index.js",
