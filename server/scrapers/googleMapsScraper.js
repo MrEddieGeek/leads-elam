@@ -1,5 +1,5 @@
 // server/scrapers/googleMapsScraper.js
-const axios = require('axios');
+import axios from 'axios';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
@@ -26,19 +26,19 @@ async function buscarEnGoogleMaps(industria, ubicacion) {
       const details = await getPlaceDetails(place.place_id);
 
       leads.push({
-        empresa: place.name || "Sin nombre",
-        contacto: details.contacto || "No disponible",
-        telefono: details.telefono || "No disponible",
-        email: details.email || "No disponible",
-        website: place.website || details.website || "No disponible",
-        direccion: place.formatted_address || "No disponible",
-        giro: industria,
-        ubicacion: ubicacion,
+        nombre_empresa: place.name || "Sin nombre",
+        persona_contacto: details.contacto || null,
+        telefono: details.telefono || null,
+        correo_electronico: details.email || null,
+        website: place.website || details.website || null,
+        giro_empresa: industria,
+        ubicacion: place.formatted_address || ubicacion,
         rating: place.rating || null,
-        reviews: place.user_ratings_total || 0,
+        total_reviews: place.user_ratings_total || 0,
         fuente: "Google Maps",
-        status: "Nuevo",
-        google_place_id: place.place_id
+        status: "nuevo",
+        google_place_id: place.place_id,
+        notas: `Rating: ${place.rating || 'N/A'} (${place.user_ratings_total || 0} reseñas)`
       });
     }
 
@@ -82,4 +82,5 @@ function extractEmailFromWebsite(url) {
   return null; // si no, lo dejamos vacío y lo buscamos después con Hunter.io
 }
 
-module.exports = { buscarEnGoogleMaps: buscarEnGoogleMaps };
+export { buscarEnGoogleMaps };
+export default buscarEnGoogleMaps;

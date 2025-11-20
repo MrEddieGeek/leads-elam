@@ -5,12 +5,16 @@
   "main": "server/index.js",
   "type": "module",
   "scripts": {
-    "build": "cd client && npm run build",
+    "build": "prisma generate && cd client && npm run build",
     "start": "node server/index.js",
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "server:dev": "nodemon server/index.js",
     "client:dev": "cd client && npm run dev",
-    "db:migrate": "node server/db/migrate.js"
+    "db:migrate": "node server/db/migrate.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio"
   },
   "keywords": [
     "leads",

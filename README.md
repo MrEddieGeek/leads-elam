@@ -4,32 +4,36 @@ Sistema automatizado de generación y gestión de leads para empresas de logíst
 
 ## Características
 
-- **Búsqueda Automatizada**: Genera leads automáticamente por giro de empresa y ubicación
+- **Búsqueda con Google Maps**: Busca leads reales usando Google Places API
 - **Gestión de Leads**: CRUD completo para administrar información de leads
 - **Filtros Avanzados**: Buscar por industria, ubicación, status y nombre de empresa
 - **Exportación**: Descarga leads en formato Excel o CSV
 - **Dashboard**: Estadísticas en tiempo real de leads por status e industria
 - **Interfaz Intuitiva**: UI moderna y responsiva con React y Tailwind CSS
+- **Sin Duplicados**: Sistema de detección automática usando google_place_id
 
 ## Tecnologías
 
 ### Backend
-- Node.js + Express
-- PostgreSQL
-- Cheerio (web scraping)
+- Node.js 20 + Express
+- PostgreSQL 14+
+- Prisma ORM (base de datos)
+- Google Places API (búsqueda de negocios)
+- Cheerio (web scraping alternativo)
 - ExcelJS (exportación)
 
 ### Frontend
-- React 18
-- Vite
-- Tailwind CSS
-- Axios
+- React 18.3
+- Vite 5
+- Tailwind CSS 3
+- Axios (cliente HTTP)
 
 ## Requisitos Previos
 
-- Node.js 18+
+- Node.js 20+
 - PostgreSQL 14+
 - npm o yarn
+- Google Maps API Key (opcional, pero recomendado para datos reales)
 
 ## Instalación Local
 
@@ -54,7 +58,18 @@ Edita `.env` con tus configuraciones:
 PORT=3000
 NODE_ENV=development
 DATABASE_URL=postgresql://username:password@localhost:5432/leads_db
+
+# Google Places API (recomendado para datos reales)
+GOOGLE_PLACES_API_KEY=tu_api_key_aqui
 ```
+
+**Obtener Google Places API Key:**
+1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
+2. Crea un nuevo proyecto o selecciona uno existente
+3. Habilita "Places API" y "Places API (New)"
+4. Ve a "Credenciales" y crea una API Key
+5. Copia la API Key y agrégala a tu archivo `.env`
+6. Nota: Google ofrece $200 USD de crédito mensual gratis (~6000 búsquedas)
 
 ### 3. Instalar dependencias
 
@@ -83,10 +98,23 @@ Crear la base de datos PostgreSQL:
 createdb leads_db
 ```
 
-Ejecutar las migraciones:
+Generar el cliente de Prisma y ejecutar migraciones:
 
 ```bash
+# Generar Prisma Client
+npm run prisma:generate
+
+# Aplicar schema a la base de datos
+npm run prisma:push
+
+# O ejecutar migraciones (alternativa)
 npm run db:migrate
+```
+
+**Comandos útiles de Prisma:**
+```bash
+npm run prisma:studio     # Abrir interfaz visual de la BD
+npm run prisma:migrate    # Crear nueva migración
 ```
 
 ### 5. Iniciar el servidor de desarrollo
@@ -141,15 +169,17 @@ El servidor estará disponible en:
    - Region: Oregon (misma que la base de datos)
    - Branch: `main`
    - Runtime: Node
-   - Build Command: `npm install && cd client && npm install && npm run build`
+   - Build Command: `npm install && npm run build`
    - Start Command: `npm start`
    - Plan: **Free**
 
 4. En "Environment Variables", agrega:
    ```
+   NODE_VERSION=20
    NODE_ENV=production
    DATABASE_URL=[pega la Internal Database URL de tu base de datos]
    PORT=10000
+   GOOGLE_PLACES_API_KEY=[tu_api_key] (opcional)
    ```
 
 5. Haz clic en "Create Web Service"
@@ -162,10 +192,16 @@ Después del primer deploy:
 2. Abre la pestaña "Shell"
 3. Ejecuta:
    ```bash
+   # Aplicar el schema de Prisma
+   npx prisma db push
+
+   # O ejecutar migraciones tradicionales
    npm run db:migrate
    ```
 
 ¡Listo! Tu aplicación estará disponible en `https://tu-app.onrender.com`
+
+**Nota:** Si agregaste GOOGLE_PLACES_API_KEY, la aplicación buscará leads reales. Si no, generará datos de prueba automáticamente.
 
 ## Limitaciones del Free Tier de Render
 

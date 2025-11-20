@@ -1,0 +1,36 @@
+// Prisma schema for Lead Generator
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id                  Int       @id @default(autoincrement())
+  nombre_empresa      String
+  telefono            String?
+  correo_electronico  String?
+  persona_contacto    String?
+  giro_empresa        String?
+  ubicacion           String?
+  status              String    @default("nuevo")
+  fuente              String?
+  google_place_id     String?   @unique
+  rating              Float?
+  total_reviews       Int?      @default(0)
+  website             String?
+  notas               String?
+  fecha_creacion      DateTime  @default(now())
+  fecha_actualizacion DateTime  @updatedAt
+
+  @@index([giro_empresa])
+  @@index([ubicacion])
+  @@index([status])
+  @@index([fecha_creacion])
+  @@map("leads")
+}

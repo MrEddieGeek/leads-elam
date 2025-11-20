@@ -14,14 +14,15 @@ cd /home/mreddie/Documents/Recursiones/ELAM/leads
 cp .env.example .env
 ```
 
-### 2. Configurar PostgreSQL
+### 2. Configurar PostgreSQL y Variables de Entorno
 
 ```bash
 # Crear base de datos
 createdb leads_db
 
-# Actualizar .env con tu configuración
+# Editar .env con tu configuración
 # DATABASE_URL=postgresql://tu_usuario:tu_password@localhost:5432/leads_db
+# GOOGLE_PLACES_API_KEY=tu_api_key (opcional - usa datos de prueba sin esto)
 ```
 
 ### 3. Instalar y construir
@@ -35,10 +36,14 @@ npm install
 cd client && npm install && cd ..
 ```
 
-### 4. Ejecutar migraciones
+### 4. Configurar base de datos con Prisma
 
 ```bash
-npm run db:migrate
+# Generar Prisma Client
+npm run prisma:generate
+
+# Aplicar schema a la base de datos
+npm run prisma:push
 ```
 
 ### 5. Iniciar en modo desarrollo
@@ -76,13 +81,16 @@ Abre tu navegador en: http://localhost:5173
 
 Una vez que el deploy termine:
 
-1. Ve a tu servicio web → **"Shell"**
-2. Ejecuta:
+1. (Opcional) Agrega **GOOGLE_PLACES_API_KEY** en Environment Variables
+2. Ve a tu servicio web → **"Shell"**
+3. Ejecuta:
    ```bash
-   npm run db:migrate
+   npx prisma db push
    ```
 
 ¡Listo! Tu app estará en: `https://tu-app.onrender.com`
+
+**Ver guía completa de despliegue en:** [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## Primeros Pasos en la Aplicación
 
