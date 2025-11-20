@@ -1,55 +1,179 @@
 import express from 'express';
-import Lead from '../models/Lead.js';
-import { buscarEnGoogleMaps } from '../scrapers/googleMapsScraper.js';
 import pkg from '@prisma/client';
 
 const { PrismaClient } = pkg;
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// ... TODAS TUS RUTAS GET, POST, PUT, DELETE que ya tenías ...
-
-// ≈≈≈≈ NUEVA RUTA PARA BUSCAR LEADS REALES ≈≈≈≈
-router.post('/search', async (req, res) => {
-  const { industria, ubicacion } = req.body;
-
-  if (!industria || !ubicacion) {
-    return res.status(400).json({
-      success: false,
-      error: 'Faltan industria o ubicación'
-    });
-  }
-
+// GET /api/leads - Get all leads with optional filters
+router.get('/', async (req, res, next) => {
   try {
-    console.log(`Buscando: ${industria} en ${ubicacion}`);
+    const {
+      giro_empresa,
+      ubicacion,
+      status,
+      search,
+      limit,
+      offset
+    } = req.query;
 
-    const leadsNuevos = await buscarEnGoogleMaps(industria, ubicacion);
+    const where = {};
 
-    if (leadsNuevos.length === 0) {
-      return res.json({ success: true, message: 'No se encontraron resultados', count: 0 });
+    if (giro_empresa) {
+      where.giro_empresa = giro_empresa;
     }
 
-    let guardados = 0;
-    for (const lead of leadsNuevos) {
-      const existe = await prisma.lead.findUnique({
-        where: { google_place_id: lead.google_place_id }
-      });
-
-      if (!existe) {
-        await prisma.lead.create({ data: lead });
-        guardados++;
-      }
+    if (ubicacion) {
+      where.ubicacion = {
+        contains: ubicacion,
+        mode: 'insensitive'
+      };
     }
 
-    res.json({
-      success: true,
-      message: `Listo! +${guardados} leads nuevos guardados (total encontrados: ${leadsNuevos.length})`,
-      count: guardados
+    if (status) {
+      where.status = status;
+    }
+
+    if (search) {
+      where.OR = [
+        { nombre_empresa: { contains: search, mode: 'insensitive' } },
+        { persona_contacto: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const leads = await prisma.lead.findMany({
+      where,
+      orderBy: { fecha_creacion: 'desc' },
+      take: limit ? parseInt(limit) : undefined,
+      skip: offset ? parseInt(offset) : undefined
     });
 
+    res.json({ success: true, data: leads, count: leads.length });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error fetching leads:', error);
+    next(error);
+  }
+});
+
+// GET /api/leads/stats - Get statistics
+router.get('/stats', async (req, res, next) => {
+  try {
+    const total = await prisma.lead.count();
+
+    const byStatus = await prisma.lead.groupBy({
+      by: ['status'],
+      _count: { status: true }
+    });
+
+    const byGiro = await prisma.lead.groupBy({
+      by: ['giro_empresa'],
+      _count: { giro_empresa: true },
+      orderBy: { _count: { giro_empresa: 'desc' } },
+      take: 10
+    });
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const recentLeads = await prisma.lead.count({
+      where: {
+        fecha_creacion: {
+          gte: sevenDaysAgo
+        }
+      }
+    });
+
+    const stats = {
+      total,
+      byStatus: byStatus.map(item => ({
+        status: item.status,
+        count: item._count.status
+      })),
+      byGiro: byGiro.map(item => ({
+        giro_empresa: item.giro_empresa,
+        count: item._count.giro_empresa
+      })),
+      recentLeads
+    };
+
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    next(error);
+  }
+});
+
+// GET /api/leads/:id - Get a single lead
+router.get('/:id', async (req, res, next) => {
+  try {
+    const lead = await prisma.lead.findUnique({
+      where: { id: parseInt(req.params.id) }
+    });
+
+    if (!lead) {
+      return res.status(404).json({ success: false, error: 'Lead not found' });
+    }
+
+    res.json({ success: true, data: lead });
+  } catch (error) {
+    console.error('Error fetching lead:', error);
+    next(error);
+  }
+});
+
+// POST /api/leads - Create a new lead
+router.post('/', async (req, res, next) => {
+  try {
+    const leadData = req.body;
+
+    // Validate required fields
+    if (!leadData.nombre_empresa) {
+      return res.status(400).json({ success: false, error: 'nombre_empresa is required' });
+    }
+
+    const newLead = await prisma.lead.create({
+      data: leadData
+    });
+
+    res.status(201).json({ success: true, data: newLead });
+  } catch (error) {
+    console.error('Error creating lead:', error);
+    next(error);
+  }
+});
+
+// PUT /api/leads/:id - Update a lead
+router.put('/:id', async (req, res, next) => {
+  try {
+    const updatedLead = await prisma.lead.update({
+      where: { id: parseInt(req.params.id) },
+      data: req.body
+    });
+
+    res.json({ success: true, data: updatedLead });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ success: false, error: 'Lead not found' });
+    }
+    console.error('Error updating lead:', error);
+    next(error);
+  }
+});
+
+// DELETE /api/leads/:id - Delete a lead
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const deletedLead = await prisma.lead.delete({
+      where: { id: parseInt(req.params.id) }
+    });
+
+    res.json({ success: true, data: deletedLead });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ success: false, error: 'Lead not found' });
+    }
+    console.error('Error deleting lead:', error);
+    next(error);
   }
 });
 
