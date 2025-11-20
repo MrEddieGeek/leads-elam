@@ -1,8 +1,9 @@
 import express from 'express';
 import Lead from '../models/Lead.js';
 import { buscarEnGoogleMaps } from '../scrapers/googleMapsScraper.js';
-import { PrismaClient } from '@prisma/client';
+import pkg from '@prisma/client';
 
+const { PrismaClient } = pkg;
 const router = express.Router();
 const prisma = new PrismaClient();
 
