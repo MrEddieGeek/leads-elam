@@ -60,7 +60,14 @@ export class MexicanBusinessScraper extends BaseScraper {
       'empaque': ['Empaques', 'Envases', 'Packaging', 'Cajas', 'Contenedores'],
       'aeroespacial': ['Aeronáutica', 'Aerospace', 'Aviación', 'Componentes Aeroespaciales'],
       'farmaceutica': ['Farmacéutica', 'Laboratorios', 'Medicamentos', 'Pharma'],
-      'agricultura': ['Agrícola', 'Cultivos', 'Granja', 'Productos Agrícolas', 'Agro']
+      'agricultura': ['Agrícola', 'Cultivos', 'Granja', 'Productos Agrícolas', 'Agro'],
+      'automotriz': ['Autopartes', 'Taller Mecánico', 'Refacciones', 'Automotriz', 'Talleres'],
+      'alimentos': ['Alimentos', 'Productos Alimenticios', 'Distribuidora', 'Procesadora', 'Comestibles'],
+      'electronica': ['Electrónica', 'Componentes', 'Tecnología', 'Sistemas', 'Semiconductores'],
+      'manufactura': ['Manufacturera', 'Fábrica', 'Producción', 'Industrial', 'Manufactura'],
+      'retail': ['Retail', 'Tienda', 'Comercial', 'Almacén', 'Supermercado'],
+      'muebles': ['Mueblería', 'Muebles', 'Diseño', 'Carpintería', 'Interiores'],
+      'logistica': ['Logística', 'Transportes', 'Almacén', 'Distribución', 'Envíos']
     };
 
     const prefixes = companyPrefixes[giro] || ['Empresa'];

@@ -26,7 +26,14 @@ router.post('/', async (req, res, next) => {
       'empaque',
       'aeroespacial',
       'farmaceutica',
-      'agricultura'
+      'agricultura',
+      'automotriz',
+      'alimentos',
+      'electronica',
+      'manufactura',
+      'retail',
+      'muebles',
+      'logistica'
     ];
 
     if (!validGiros.includes(giro_empresa.toLowerCase())) {
@@ -110,7 +117,14 @@ router.get('/industries', (req, res) => {
     { value: 'empaque', label: 'Empaque' },
     { value: 'aeroespacial', label: 'Aeroespacial' },
     { value: 'farmaceutica', label: 'Farmacéutica' },
-    { value: 'agricultura', label: 'Agricultura' }
+    { value: 'agricultura', label: 'Agricultura' },
+    { value: 'automotriz', label: 'Automotriz' },
+    { value: 'alimentos', label: 'Alimentos' },
+    { value: 'electronica', label: 'Electrónica' },
+    { value: 'manufactura', label: 'Manufactura' },
+    { value: 'retail', label: 'Retail' },
+    { value: 'muebles', label: 'Muebles' },
+    { value: 'logistica', label: 'Logística' }
   ];
 
   res.json({ success: true, data: industries });
