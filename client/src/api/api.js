@@ -27,6 +27,8 @@ export const leadsAPI = {
 
   delete: (id) => api.delete(`/leads/${id}`),
 
+  deleteAll: () => api.delete('/leads/all'),
+
   getStats: () => api.get('/leads/stats')
 };
 

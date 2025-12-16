@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaSearch, FaDownload, FaPlus, FaFilter, FaChartBar, FaRobot } from 'react-icons/fa';
+import { FaSearch, FaDownload, FaPlus, FaFilter, FaChartBar, FaRobot, FaTrashAlt } from 'react-icons/fa';
 import Dashboard from './components/Dashboard';
 import LeadsTable from './components/LeadsTable';
 import SearchFilters from './components/SearchFilters';
@@ -120,6 +120,32 @@ function App() {
     }
   };
 
+  const handleDeleteAllLeads = async () => {
+    // First confirmation
+    const firstConfirm = window.confirm(
+      `⚠️ ADVERTENCIA: Está a punto de eliminar TODOS los leads (${leads.length} registros).\n\nEsta acción NO se puede deshacer.\n\n¿Está completamente seguro?`
+    );
+
+    if (!firstConfirm) return;
+
+    // Second confirmation (extra safety)
+    const secondConfirm = window.confirm(
+      '🚨 ÚLTIMA CONFIRMACIÓN:\n\n¿Realmente desea eliminar todos los leads de forma permanente?'
+    );
+
+    if (!secondConfirm) return;
+
+    try {
+      const response = await leadsAPI.deleteAll();
+      alert(`✅ ${response.data.data.count} leads eliminados exitosamente`);
+      fetchLeads();
+      fetchStats();
+    } catch (error) {
+      console.error('Error deleting all leads:', error);
+      alert('❌ Error al eliminar todos los leads');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -149,6 +175,14 @@ function App() {
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <FaPlus /> Agregar Lead
+            </button>
+            <button
+              onClick={handleDeleteAllLeads}
+              disabled={leads.length === 0}
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title={leads.length === 0 ? 'No hay leads para eliminar' : 'Eliminar todos los leads'}
+            >
+              <FaTrashAlt /> Eliminar Todos
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}

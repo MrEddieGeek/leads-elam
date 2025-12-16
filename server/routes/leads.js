@@ -103,6 +103,24 @@ router.get('/stats', async (req, res, next) => {
   }
 });
 
+// DELETE /api/leads/all - Delete all leads (DESTRUCTIVE!)
+router.delete('/all', async (req, res, next) => {
+  try {
+    const result = await prisma.lead.deleteMany({});
+
+    res.json({
+      success: true,
+      data: {
+        count: result.count,
+        message: `${result.count} leads eliminados exitosamente`
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting all leads:', error);
+    next(error);
+  }
+});
+
 // GET /api/leads/:id - Get a single lead
 router.get('/:id', async (req, res, next) => {
   try {
