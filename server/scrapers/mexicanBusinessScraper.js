@@ -67,7 +67,17 @@ export class MexicanBusinessScraper extends BaseScraper {
       'manufactura': ['Manufacturera', 'Fábrica', 'Producción', 'Industrial', 'Manufactura'],
       'retail': ['Retail', 'Tienda', 'Comercial', 'Almacén', 'Supermercado'],
       'muebles': ['Mueblería', 'Muebles', 'Diseño', 'Carpintería', 'Interiores'],
-      'logistica': ['Logística', 'Transportes', 'Almacén', 'Distribución', 'Envíos']
+      'logistica': ['Logística', 'Transportes', 'Almacén', 'Distribución', 'Envíos'],
+      'llantas': ['Llantas', 'Neumáticos', 'Distribuidora de Llantas', 'Centro de Llantas'],
+      'talleres_de_servicio': ['Taller', 'Servicios Automotrices', 'Mecánica', 'Reparación'],
+      'tractocamiones': ['Tractocamiones', 'Camiones Pesados', 'Unidades de Carga'],
+      'servicios_de_agencia': ['Agencia de Servicios', 'Servicios Empresariales'],
+      'agencias': ['Agencia', 'Representaciones', 'Corredores'],
+      'talleres_de_mantenimiento': ['Taller de Mantenimiento', 'Servicios de Mantenimiento'],
+      'reparacion_de_transmisiones': ['Transmisiones', 'Reparación Transmisiones', 'Especialistas'],
+      'diferenciales': ['Diferenciales', 'Reparación de Diferenciales', 'Especialistas'],
+      'motores': ['Motores', 'Reparación de Motores', 'Rectificación', 'Mecánica de Motores'],
+      'maquinaria_pesada': ['Maquinaria Pesada', 'Equipo Industrial', 'Construcción']
     };
 
     const prefixes = companyPrefixes[giro] || ['Empresa'];

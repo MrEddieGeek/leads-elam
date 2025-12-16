@@ -33,7 +33,17 @@ router.post('/', async (req, res, next) => {
       'manufactura',
       'retail',
       'muebles',
-      'logistica'
+      'logistica',
+      'llantas',
+      'talleres_de_servicio',
+      'tractocamiones',
+      'servicios_de_agencia',
+      'agencias',
+      'talleres_de_mantenimiento',
+      'reparacion_de_transmisiones',
+      'diferenciales',
+      'motores',
+      'maquinaria_pesada'
     ];
 
     if (!validGiros.includes(giro_empresa.toLowerCase())) {
@@ -124,7 +134,17 @@ router.get('/industries', (req, res) => {
     { value: 'manufactura', label: 'Manufactura' },
     { value: 'retail', label: 'Retail' },
     { value: 'muebles', label: 'Muebles' },
-    { value: 'logistica', label: 'Logística' }
+    { value: 'logistica', label: 'Logística' },
+    { value: 'llantas', label: 'Llantas' },
+    { value: 'talleres_de_servicio', label: 'Talleres de Servicio' },
+    { value: 'tractocamiones', label: 'Tractocamiones' },
+    { value: 'servicios_de_agencia', label: 'Servicios de Agencia' },
+    { value: 'agencias', label: 'Agencias' },
+    { value: 'talleres_de_mantenimiento', label: 'Talleres de Mantenimiento' },
+    { value: 'reparacion_de_transmisiones', label: 'Reparación de Transmisiones' },
+    { value: 'diferenciales', label: 'Diferenciales' },
+    { value: 'motores', label: 'Motores' },
+    { value: 'maquinaria_pesada', label: 'Maquinaria Pesada' }
   ];
 
   res.json({ success: true, data: industries });

@@ -63,6 +63,14 @@ function ScrapeModal({ onClose, onComplete }) {
     onComplete();
   };
 
+  const handleReset = () => {
+    setGiroEmpresa('');
+    setUbicacion('');
+    setMaxResults(50);
+    setResult(null);
+    setLoading(false);
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -164,6 +172,13 @@ function ScrapeModal({ onClose, onComplete }) {
                   )}
                 </button>
                 <button
+                  onClick={handleReset}
+                  disabled={loading}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Limpiar
+                </button>
+                <button
                   onClick={onClose}
                   disabled={loading}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
@@ -201,12 +216,20 @@ function ScrapeModal({ onClose, onComplete }) {
                 </div>
               )}
 
-              <button
-                onClick={handleFinish}
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors"
-              >
-                Ver Leads
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleReset}
+                  className="flex-1 border border-primary-600 text-primary-600 hover:bg-primary-50 px-6 py-3 rounded-lg transition-colors"
+                >
+                  Nueva Búsqueda
+                </button>
+                <button
+                  onClick={handleFinish}
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors"
+                >
+                  Ver Leads
+                </button>
+              </div>
             </>
           )}
         </div>
